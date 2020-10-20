@@ -1,1 +1,16 @@
-Escriba aquí su respuesta al ejercicio 4.
+En los algoritmos devoradores se distinguen los siguientes elementos:
+\begin{enumerate}
+    \item Un conjunto de \textbf{candidatos}. 
+    En nuestro caso, las celdas del mapa.
+    \item Un conjunto de \textbf{candidatos seleccionados}. 
+    En nuestro caso, las celdas del mapa seleccionadas para colocar nuestras defensas y/o el C.E.M.
+    \item Una \textbf{función solución} que comprueba si un conjunto de candidatos es una solución (posiblemente no óptima). 
+    En nuestro caso, haber colocado todas las defensas disponibles, incluida la primera de todas que es el C.E.M
+    \item Una \textbf{función de selección} que indica el candidato más prometedor de los que quedan. 
+    En nuestro caso, seleccionará la celda más prometedora, que es la mejor valorada.
+    \item Una \textbf{función de factibilidad} que comprueba si un conjunto de candidatos se puede ampliar para obtener una solución (no necesariamente óptima).
+    En nuestro caso, la celda se podrá colocar cuando esté en una posición dentro del mapa y además no choque con una defensa ni con un obstáculo.
+    \item Una \textbf{función objetivo} que asocia un valor a una solución, y que queremos optimizar. 
+    En nuestro caso, el tiempo que emplean los ucos en destruir nuestro C.E.M.
+    \item Un \textbf{objetivo}. En nuestro caso, maxizar ese tiempo.
+\end{enumerate}
