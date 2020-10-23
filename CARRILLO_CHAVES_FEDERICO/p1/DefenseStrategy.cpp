@@ -26,7 +26,7 @@ using namespace Asedio;
 struct Celda {
     int valor;
 	Vector3 vector3;
-	Celda(int valor, Vector3 vector3) : valor(valor),vector3(vector3){}
+	Celda(int valor, const Vector3& vector3) : valor(valor),vector3(vector3){}
 };
 std::list<Celda> candidatos;
 
@@ -61,14 +61,12 @@ void crearCeldasCandidatas(int nCellsWidth, int nCellsHeight, float mapWidth, fl
     }
 }
 
-bool posicionDentroMapa(const Celda prometedora,float radio,float mapWidth, float mapHeight){
-	if(prometedora.vector3.x + radio >= mapWidth || prometedora.vector3.y + radio >= mapHeight
-	   || prometedora.vector3.x - radio <= 0.0 || prometedora.vector3.y - radio <= 0.0)
-	    return false;
-    else
-    {
+bool posicionDentroMapa(const Celda& prometedora,float radio,float mapWidth, float mapHeight){
+    if (prometedora.vector3.x + radio < mapWidth && prometedora.vector3.y + radio < mapHeight &&
+        prometedora.vector3.x - radio > 0.0 && prometedora.vector3.y - radio > 0.0) {
         return true;
-    }
+    } else
+        return false;
 }
 
 float cellValue(int row, int col, bool** freeCells, int nCellsWidth, int nCellsHeight
