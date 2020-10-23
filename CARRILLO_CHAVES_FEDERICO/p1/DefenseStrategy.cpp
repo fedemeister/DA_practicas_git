@@ -17,6 +17,8 @@
 RAND_TYPE SimpleRandomGenerator::a;
 #endif
 
+#include <queue> 
+
 using namespace Asedio;
 
 // Estructura que representa una celda candidata
@@ -28,7 +30,21 @@ struct Celda {
 	Vector3 vector3;
 	Celda(int valor, const Vector3& vector3) : valor(valor),vector3(vector3){}
 };
-std::list<Celda> candidatos;
+std::vector<Celda> candidatos;
+
+// this is an strucure which implements the 
+// operator overlading 
+struct ComparaValor { 
+    bool operator()(Celda const& celda1, Celda const& celda2) 
+    { 
+        // return "true" if "celda1" is ordered  
+        // before "celda2", for example: 
+        return celda1.valor < celda2.valor; 
+    }
+};
+
+std::priority_queue<Celda, std::vector<Celda>, ComparaValor> Q;
+
 
 // Devuelve la posición en el mapa del centro de la celda (i,j)
 // i - fila
