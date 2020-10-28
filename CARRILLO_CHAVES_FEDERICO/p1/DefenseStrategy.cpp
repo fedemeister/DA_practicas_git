@@ -68,20 +68,6 @@ void positionToCell(const Vector3 &pos, int &i_out, int &j_out, float cellWidth,
 }
 
 
-// NO USADA AÚN
-void crearCeldasCandidatas(int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight) {
-    float cellWidth = mapWidth / nCellsWidth;
-    float cellHeight = mapHeight / nCellsHeight;
-    Vector3 vector3;
-    for (int i = 0; i < nCellsHeight; i++) {
-        for (int j = 0; j < nCellsWidth; j++) {
-            vector3 = cellCenterToPosition(i, j, cellWidth, cellHeight);
-            Celda aux = Celda(1, vector3);
-            candidatos.push_back(aux);
-        }
-    }
-}
-
 bool posicionDentroMapa(const Celda &prometedora, float radio, float mapWidth, float mapHeight) {
     if (prometedora.vector3.x + radio < mapWidth && prometedora.vector3.y + radio < mapHeight &&
         prometedora.vector3.x - radio > 0.0 && prometedora.vector3.y - radio > 0.0) {
@@ -92,7 +78,7 @@ bool posicionDentroMapa(const Celda &prometedora, float radio, float mapWidth, f
 
 float cellValue(int row, int col, bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight,
                 List<Object *> obstacles, List<Defense *> defenses) {
-    return 0; // implemente aqui la función que asigna valores a las celdas
+    return (nCellsWidth-col)*(nCellsHeight-row); // implemente aqui la función que asigna valores a las celdas
 }
 
 bool factibilidad(Defense *defense, std::list<Object *> obstacles, std::list<Defense *> defensesPlaced, float mapWidth,
@@ -140,15 +126,29 @@ placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidt
     std::cout << "mapHeight:" << mapHeight << std::endl;
     std::cout << "******************************************************" << std::endl;
 
+
+    Vector3 aux_vector3;
+    for (int i = 0; i < nCellsHeight; i++) {
+        for (int j = 0; j < nCellsWidth; j++) {
+            aux_vector3 = cellCenterToPosition(i, j, cellWidth, cellHeight);
+            Celda aux = Celda(cellValue(i,j,freeCells,nCellsWidth,nCellsHeight,mapWidth,mapHeight,obstacles,defenses), aux_vector3);
+            Q.push(aux);
+        }
+    }
+
     int maxAttemps = 1000;
     auto currentDefense = defenses.begin();
     std::list<Defense *> defensesPlaced;
-    Vector3 vector3 = cellCenterToPosition(5, 3, cellWidth, cellHeight);
-    Celda celdaParaProbar(0, vector3);
+    //Vector3 vector3 = cellCenterToPosition(5, 3, cellWidth, cellHeight);
+    //Celda celdaParaProbar(0, vector3);
     int i, j;
     while (currentDefense != defenses.end() && maxAttemps > 0) {
+        Celda celda = Q.top();
+        Q.pop();
+        (*currentDefense)->position = celda.vector3;
         if (factibilidad((*currentDefense), obstacles, defensesPlaced, mapWidth, mapHeight)) {
-            (*currentDefense)->position = celdaParaProbar.vector3;
+            (*currentDefense)->position = celda.vector3;
+            defensesPlaced.push_back((*currentDefense));
             ++currentDefense;
         } else {
             std::cout << "NO SE PUEDE COLOCAR DEFENSA" << std::endl;
