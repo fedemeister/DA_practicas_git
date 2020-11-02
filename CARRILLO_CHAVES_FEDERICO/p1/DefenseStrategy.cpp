@@ -83,19 +83,30 @@ struct ComparaRadioDefensas {
     }
 };
 
+// idea de https://en.cppreference.com/w/cpp/algorithm/all_any_none_of
+struct choca {
+    Defense *mi_defensa;
+    Object *objeto;
+
+    explicit choca(Object *objeto, Defense *mi_defensa) : objeto(objeto),
+                                                          mi_defensa(mi_defensa) {}
+
+    bool operator()(Object *object) const {
+        return
+                (_distance(object->position, mi_defensa->position) <=
+                 object->radio + (mi_defensa->radio));
+    }
+};
+
 double cellValue(int row, int col, bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight,
                  const std::list<Object *> &obstacles, std::list<Defense *> defenses, bool esCEM) {
     // implemente aqui la función que asigna valores a las celdas
     float cellWidth = mapWidth / float(nCellsWidth);
     float cellHeight = mapHeight / float(nCellsHeight);
-    //Vector3 centro = cellCenterToPosition(nCellsWidth / 2, nCellsHeight / 2, cellWidth, cellHeight);
-    //Vector3 current = cellCenterToPosition(row,col,cellWidth,cellHeight);
     if (esCEM) {
         Vector3 pos_actual = cellCenterToPosition(row, col, cellWidth, cellHeight);
         Vector3 centroDelMapa_v3 = Vector3(mapWidth / 2, mapHeight / 2, 0);
         return abs(_distance(pos_actual, centroDelMapa_v3));
-        //return (nCellsWidth - col) * (nCellsHeight - row);
-        //return (((nCellsWidth - col/2))/(mapWidth / 2) * (nCellsHeight - row/2)/(mapHeight / 2));
     } else {
         int i_out;
         int j_out;
@@ -105,14 +116,10 @@ double cellValue(int row, int col, bool **freeCells, int nCellsWidth, int nCells
         aux_vector3 = cellCenterToPosition(row - i_out, col - j_out, cellWidth, cellHeight);
         return std::max(mapWidth, mapHeight) - aux_vector3.length();
     }
-
-    //return abs(_distance(current,centro));
 }
 
-bool factibilidad(const std::vector<Defense *>& defensasColocadas, float mapWidth, float mapHeight, Defense *mi_defensa,
-                  const std::list<Object *>& obstacles) {
-    //auto obstaculo_actual = obstacles.begin();
-    //auto iterador_defensacolocada = defensasColocadas.begin();
+bool factibilidad(const std::vector<Defense *> &defensasColocadas, float mapWidth, float mapHeight, Defense *mi_defensa,
+                  const std::list<Object *> &obstacles) {
     Object *obstaculo = nullptr;
     Object *defensa = nullptr;
 
@@ -124,47 +131,15 @@ bool factibilidad(const std::vector<Defense *>& defensasColocadas, float mapWidt
         return false;
     }
 
-    // idea de https://en.cppreference.com/w/cpp/algorithm/all_any_none_of
-    struct choca {
-        Defense *mi_defensa;
-        Object *objeto;
-
-        explicit choca(Object *objeto, Defense *mi_defensa) : objeto(objeto),
-                                                              mi_defensa(mi_defensa) {}
-
-        bool operator()(Object *object) const {
-            return
-                    (_distance(object->position, mi_defensa->position) <=
-                     object->radio + (mi_defensa->radio));
-        }
-    };
-/*
-    //No colisiona con defensas ya almacenadas
-    for (auto &&defensa : defensasColocadas) {
-        if (_distance(defensa->position, mi_defensa->position) >=
-            defensa->radio + mi_defensa->radio) {}
-        else {
-            return false;
-        }
-    }
-*/
-    if (std::any_of(defensasColocadas.cbegin(), defensasColocadas.cend(),
-                    choca(defensa, mi_defensa))) {
+    // No colisiona con defensas colocadas
+    if (std::any_of(defensasColocadas.cbegin(), defensasColocadas.cend(), choca(defensa, mi_defensa))) {
         return false;
     }
 
+    //No colisiona con ningún obstáculo
     if (std::any_of(obstacles.cbegin(), obstacles.cend(), choca(obstaculo, mi_defensa))) {
         return false;
     }
-
-    // No colisiona con ningún obstáculo
-    // for (auto &&obstaculo : obstacles) {
-    //     if (_distance(obstaculo->position, mi_defensa->position) >=
-    //         obstaculo->radio + (mi_defensa->radio)) {}
-    //     else {
-    //         return false;
-    //     }
-    // }
 
     return true;
 }
@@ -181,18 +156,6 @@ placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidt
 
     std::priority_queue<Celda, std::vector<Celda>, ComparaValor> Q; // cola de prioridad para las celdas candidatas
 
-    //std::cout << "******************************************************" << std::endl;
-    //std::cout << "freeCells:" << *freeCells << std::endl;
-    //std::cout << "nCellsWidth:" << nCellsWidth << std::endl;
-    //std::cout << "nCellsHeight:" << nCellsHeight << std::endl;
-    //std::cout << "mapWidth:" << mapWidth << std::endl;
-    //std::cout << "mapHeight:" << mapHeight << std::endl;
-    //std::cout << "******************************************************" << std::endl;
-    //for (int i = 0; i < nCellsWidth; i++) 
-    //    for (int j = 0; j < nCellsHeight; j++)
-    //      std::cout << freeCells[i][j] << " \n"[j == nCellsHeight-1]; 
-
-
     Vector3 aux_vector3;
     for (int i = 0; i < nCellsHeight; i++) {
         for (int j = 0; j < nCellsWidth; j++) {
@@ -206,11 +169,9 @@ placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidt
     }
 
     std::vector<Defense *> defensesPlaced;
-    //defensesPlaced.sort(ComparaRadioDefensas);
-    //defenses.sort([](const Defense *a, const Defense *b) { return a->radio > b->radio; });
-    //defenses.sort([](const Defense *a, const Defense *b) { return a->damage > b->damage; });
     auto defensaCandidata = defenses.begin();
     bool CEM_colocado = false;
+
     // CEM
     while (defensaCandidata != defenses.end() && !CEM_colocado) {
         Celda celda = Q.top();
@@ -224,7 +185,7 @@ placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidt
     }
 
     // demás defensas
-    std::priority_queue<Celda, std::vector<Celda>, ComparaValor2> Q2;   // reseteamos la cola
+    std::priority_queue<Celda, std::vector<Celda>, ComparaValor2> Q2;   // nueva cola de prioridad
     for (int i = 0; i < nCellsHeight; i++) {
         for (int j = 0; j < nCellsWidth; j++) {
             aux_vector3 = cellCenterToPosition(i, j, cellWidth, cellHeight);
