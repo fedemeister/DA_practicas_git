@@ -109,41 +109,64 @@ double cellValue(int row, int col, bool **freeCells, int nCellsWidth, int nCells
     //return abs(_distance(current,centro));
 }
 
-bool factibilidad(float mapWidth, float mapHeight, Defense *mi_defensa, std::list<Object *> obstacles,
-                  std::vector<Defense *> defensesPlaced) {
-    bool factible = true;
-    auto obstaculo_actual = obstacles.begin();
-    auto iterador_defensacolocada = defensesPlaced.begin();
+bool factibilidad(const std::vector<Defense *>& defensasColocadas, float mapWidth, float mapHeight, Defense *mi_defensa,
+                  const std::list<Object *>& obstacles) {
+    //auto obstaculo_actual = obstacles.begin();
+    //auto iterador_defensacolocada = defensasColocadas.begin();
+    Object *obstaculo = nullptr;
+    Object *defensa = nullptr;
 
     // Dentro de los bordes del mapa
     if (mi_defensa->position.x + mi_defensa->radio <= mapWidth && (mi_defensa->position.x - mi_defensa->radio) >= 0 &&
         (mi_defensa->position.y + mi_defensa->radio) <= mapHeight &&
         (mi_defensa->position.y - mi_defensa->radio) >= 0) {}
     else {
-        factible = false;
+        return false;
     }
 
-    //No colisiona con defensas ya almacenadas
-    while (iterador_defensacolocada != defensesPlaced.end() && factible) {
-        if ((_distance(mi_defensa->position, (*iterador_defensacolocada)->position)
-             - (mi_defensa->radio + (*iterador_defensacolocada)->radio)) >= 0) {}
-        else {
-            factible = false;
+    // idea de https://en.cppreference.com/w/cpp/algorithm/all_any_none_of
+    struct choca {
+        Defense *mi_defensa;
+        Object *objeto;
+
+        explicit choca(Object *objeto, Defense *mi_defensa) : objeto(objeto),
+                                                              mi_defensa(mi_defensa) {}
+
+        bool operator()(Object *object) const {
+            return
+                    (_distance(object->position, mi_defensa->position) <=
+                     object->radio + (mi_defensa->radio));
         }
-        iterador_defensacolocada++;
+    };
+/*
+    //No colisiona con defensas ya almacenadas
+    for (auto &&defensa : defensasColocadas) {
+        if (_distance(defensa->position, mi_defensa->position) >=
+            defensa->radio + mi_defensa->radio) {}
+        else {
+            return false;
+        }
+    }
+*/
+    if (std::any_of(defensasColocadas.cbegin(), defensasColocadas.cend(),
+                    choca(defensa, mi_defensa))) {
+        return false;
+    }
+
+    if (std::any_of(obstacles.cbegin(), obstacles.cend(), choca(obstaculo, mi_defensa))) {
+        return false;
     }
 
     // No colisiona con ningún obstáculo
-    while (obstaculo_actual != obstacles.end() && factible) {
-        if ((_distance(mi_defensa->position, (*obstaculo_actual)->position) -
-             (mi_defensa->radio + (*obstaculo_actual)->radio)) >= 0) {}
-        else {
-            factible = false;
-        }
-        obstaculo_actual++;
-    }
+    // for (auto &&obstaculo : obstacles) {
+    //     if (_distance(obstaculo->position, mi_defensa->position) >=
+    //         obstaculo->radio + (mi_defensa->radio)) {}
+    //     else {
+    //         return false;
+    //     }
+    // }
 
-    return factible;
+    return true;
 }
 
 
@@ -193,7 +216,7 @@ placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidt
         Celda celda = Q.top();
         Q.pop();
         (*defensaCandidata)->position = celda.vector3_;
-        if (factibilidad(mapWidth, mapHeight, (*defensaCandidata), obstacles, defensesPlaced)) {
+        if (factibilidad(defensesPlaced, mapWidth, mapHeight, (*defensaCandidata), obstacles)) {
             defensesPlaced.push_back((*defensaCandidata));
             ++defensaCandidata;
             CEM_colocado = true;
@@ -218,7 +241,7 @@ placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidt
         Celda celda = Q2.top();
         Q2.pop();
         (*defensaCandidata)->position = celda.vector3_;
-        if (factibilidad(mapWidth, mapHeight, (*defensaCandidata), obstacles, defensesPlaced)) {
+        if (factibilidad(defensesPlaced, mapWidth, mapHeight, (*defensaCandidata), obstacles)) {
             defensesPlaced.push_back((*defensaCandidata));
             ++defensaCandidata;
         }
