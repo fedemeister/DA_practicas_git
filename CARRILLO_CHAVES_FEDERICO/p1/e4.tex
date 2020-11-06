@@ -7,7 +7,7 @@ En los algoritmos devoradores se distinguen los siguientes elementos:
     \item Una \textbf{función solución} que comprueba si un conjunto de candidatos es una solución (posiblemente no óptima). 
     En nuestro caso, haber colocado todas las defensas disponibles, incluida la primera de todas que es el C.E.M
     \item Una \textbf{función de selección} que indica el candidato más prometedor de los que quedan. 
-    En nuestro caso, seleccionará la celda más prometedora, que es la mejor valorada.
+    En nuestro caso, seleccionará la celda más prometedora, que es la mejor valorada extrayendo cada vez que toque la primera posición de la cola de prioridad.
     \item Una \textbf{función de factibilidad} que comprueba si un conjunto de candidatos se puede ampliar para obtener una solución (no necesariamente óptima).
     En nuestro caso, la celda se podrá colocar cuando esté en una posición dentro del mapa y además no choque con una defensa ni con un obstáculo.
     \item Una \textbf{función objetivo} que asocia un valor a una solución, y que queremos optimizar. 

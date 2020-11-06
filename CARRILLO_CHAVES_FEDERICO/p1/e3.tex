@@ -1,13 +1,85 @@
+Nuestro algoritmo devorador va a usar una cola de prioridad Q para almacenar las celdas candidatas.
+Recorreremos todas las posiciones del tablero y le aplicaremos la función de evaluación.
+Ahora sólo nos queda ir sacando de la cola de prioridad una por una las celdas hasta que demos con la primera que sea factible. Una vez encontrada se coloca el CEM en esa posición y se almacena también en un vector de defensas ya colocadas.
+
 \begin{lstlisting}
-// sustituya este codigo por su respuesta
-void placeDefenses(...) {
+  // Estructura que representa una celda candidata
+  // valor_       - valor de la celda
+  // vector3_     - coordenadas de la celda en Vector3
+class Celda {
+public:
+  double valor_;
+  Vector3 vector3_;
 
-    List<Defense*>::iterator currentDefense = defenses.begin();
-    while(currentDefense != defenses.end() && maxAttemps > 0) {
+  Celda(double valor, const Vector3 &vector3) : valor_(valor), vector3_(vector3) {}
+};
 
-        (*currentDefense)->position.x = ((int)(_RAND2(nCellsWidth))) * cellWidth + cellWidth * 0.5f;
-        ...
-        ++currentDefense;
+// this is an strucure which implements the
+// operator overlading 
+struct ComparaValor {
+  bool operator()(Celda const &celda1, Celda const &celda2) {
+    // Cuanto mayor valor, mayor prioridad.
+    // Con esto conseguimos que las celdas con mas cerca del centro tengan mayor prioridad. 
+    return celda1.valor_ > celda2.valor_;
+  }
+};
+
+// cola de prioridad para las celdas candidatas
+  std::priority_queue<Celda, std::vector<Celda>, ComparaValor> Q; 
+
+\end{lstlisting}
+
+\begin{lstlisting}
+int cellValue(int row, int col, bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight, const std::list<Object *> &obstacles, std::list<Defense *> defenses, bool esCEM) {
+  float cellWidth = mapWidth / float(nCellsWidth);
+  float cellHeight = mapHeight / float(nCellsHeight);
+  if (esCEM) {
+    Vector3 pos_actual = cellCenterToPosition(row, col, cellWidth, cellHeight);
+    Vector3 centroDelMapa_v3 = Vector3(mapWidth / 2, mapHeight / 2, 0);
+    return abs(_distance(pos_actual, centroDelMapa_v3));
+  } else {
+    .
+    .
+    .
+  }
+}
+\end{lstlisting}
+
+
+\begin{lstlisting}
+void DEF_LIB_EXPORTED
+placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight, std::list<Object *> obstacles, std::list<Defense *> defenses) {
+.
+.
+.
+  Vector3 aux_vector3;
+    for (int i = 0; i < nCellsHeight; i++) {
+      for (int j = 0; j < nCellsWidth; j++) {
+        aux_vector3 = cellCenterToPosition(i, j, cellWidth, cellHeight);
+        Celda aux = Celda(
+              cellValue(i, j, freeCells, nCellsWidth, nCellsHeight, mapWidth, mapHeight, obstacles, defenses, true),
+              aux_vector3
+              );
+          Q.push(aux);
+      }
     }
+
+  std::vector<Defense *> defensesPlaced;
+  auto defensaCandidata = defenses.begin();
+  bool CEM_colocado = false;
+// CEM
+  while (defensaCandidata != defenses.end() && !CEM_colocado) {
+    Celda celda = Q.top();
+    Q.pop();
+    (*defensaCandidata)->position = celda.vector3_;
+    if (factibilidad(defensesPlaced, mapWidth, mapHeight, (*defensaCandidata), obstacles)) {
+        defensesPlaced.push_back((*defensaCandidata));
+        ++defensaCandidata;
+        CEM_colocado = true;
+    }
+  }
+.
+.
+.
 }
 \end{lstlisting}

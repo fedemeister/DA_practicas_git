@@ -98,7 +98,7 @@ struct choca {
     }
 };
 
-double cellValue(int row, int col, bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight,
+int cellValue(int row, int col, bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight,
                  const std::list<Object *> &obstacles, std::list<Defense *> defenses, bool esCEM) {
     // implemente aqui la función que asigna valores a las celdas
     float cellWidth = mapWidth / float(nCellsWidth);
@@ -210,9 +210,9 @@ placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidt
 
 #ifdef PRINT_DEFENSE_STRATEGY
 
-    auto **cellValues = new double *[nCellsHeight];
+    float **cellValues = new float *[nCellsHeight];
     for (int i = 0; i < nCellsHeight; ++i) {
-        cellValues[i] = new double[nCellsWidth];
+        cellValues[i] = new float[nCellsWidth];
         for (int j = 0; j < nCellsWidth; ++j) {
             cellValues[i][j] =
                     ((int) (cellValue(i, j, freeCells, nCellsWidth, nCellsHeight, mapWidth, mapHeight, obstacles,
@@ -220,7 +220,7 @@ placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidt
         }
     }
     dPrintMap("strategy.ppm", nCellsHeight, nCellsWidth, cellHeight, cellWidth, freeCells,
-              reinterpret_cast<float **>(cellValues), std::list<Defense *>(), true);
+              cellValues, std::list<Defense *>(), false);
 
     for (int i = 0; i < nCellsHeight; ++i)
         delete[] cellValues[i];

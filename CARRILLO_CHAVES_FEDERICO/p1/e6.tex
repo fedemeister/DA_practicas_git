@@ -1,13 +1,62 @@
 \begin{lstlisting}
-// sustituya este codigo por su respuesta
-void placeDefenses(...) {
+struct ComparaValor2 {
+  bool operator()(Celda const &celda1, Celda const &celda2) {
+    // Cuanto menor valor, mayor prioridad.
+    // Con esto conseguimos que las celdas con menor distancia al CEM tengan mas prioridad.  
+    return celda1.valor_ < celda2.valor_;
+  }
+};
 
-    List<Defense*>::iterator currentDefense = defenses.begin();
-    while(currentDefense != defenses.end() && maxAttemps > 0) {
+\end{lstlisting}
 
-        (*currentDefense)->position.x = ((int)(_RAND2(nCellsWidth))) * cellWidth + cellWidth * 0.5f;
-        ...
-        ++currentDefense;
+\begin{lstlisting}
+int cellValue(int row, int col, bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight, const std::list<Object *> &obstacles, std::list<Defense *> defenses, bool esCEM) {
+  .
+  .
+  .
+  if (esCEM) {
+      .
+      .
+      .
+  } else {
+    int i_out;
+    int j_out;
+    std::list<Defense *>::const_iterator ci_CEM = defenses.begin();
+    Vector3 aux_vector3;
+    positionToCell((*ci_CEM)->position, i_out, j_out, cellWidth, cellHeight);
+    aux_vector3 = cellCenterToPosition(row - i_out, col - j_out, cellWidth, cellHeight);
+    return std::max(mapWidth, mapHeight) - aux_vector3.length();
+  }
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+void DEF_LIB_EXPORTED
+placeDefenses(bool **freeCells, int nCellsWidth, int nCellsHeight, float mapWidth, float mapHeight, std::list<Object *> obstacles, std::list<Defense *> defenses) {
+    .
+    .
+    .
+// rest of our defenses
+std::priority_queue<Celda, std::vector<Celda>, ComparaValor2> Q2; // nueva cola de prioridad
+ for (int i = 0; i < nCellsHeight; i++) {
+  for (int j = 0; j < nCellsWidth; j++) {
+    aux_vector3 = cellCenterToPosition(i, j, cellWidth, cellHeight);
+    Celda aux_celda = Celda(
+        cellValue(i, j, freeCells, nCellsWidth, nCellsHeight, mapWidth,  mapHeight, obstacles, defenses, false), 
+        aux_vector3
+        );
+    Q2.push(aux_celda);
     }
+ }
+    
+  while (defensaCandidata != defenses.end()) {
+    Celda celda = Q2.top();
+    Q2.pop();
+    (*defensaCandidata)->position = celda.vector3_;
+    if (factibilidad(defensesPlaced, mapWidth, mapHeight, (*defensaCandidata), obstacles)) {
+      defensesPlaced.push_back((*defensaCandidata));
+      ++defensaCandidata;
+    }
+  }
 }
 \end{lstlisting}

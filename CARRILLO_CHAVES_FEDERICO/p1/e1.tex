@@ -1,14 +1,4 @@
-La estrategia que vamos a usar para determinar qué celda es mejor celda para el centro de extracción de minerales, en adelante C.E.M, se constituye con respecto a los siguientes términos.\newline
-- Queremos que la celda esté dentro de los bordes del mapa.\newline
-- Queremos que la celda no esté ocupada por obstáculos. \newline
-- Queremos que la celda esté cubierta a su alrededor lo más posible por obstáculos, ya que nos va a servir para proteger aún más nuestro C.E.M.\newline
-- Queremos que la celda se encuentre cerca del centro si hay sitios con similar grado de beneficio.\newline
-
-La primera y segunda idea es muy obvia, ya que queremos que la posición sea válida para nuestro C.E.M.
-Para la tercera idea podemos verlo visualmente como que nosotros queremos tener a todos los ucos viniendo desde el número menor de direcciones posibles. Por ejemplo, nos gustaría poner nuestro C.E.M en un callejón sin salida para que los ucos nos vengan de frente.
-
-Este conjunto de estrategias se traducirá en un número para nuestra celda. Cuanto mayor sea ese número más prometedora será esa celda para colocar nuestro C.E.M.
-
+Para el centro de extracción de minerales, en adelante C.E.M, las celdas del terreno del mapa estarán mejor valoradas cuánto más cerca se encuentren a la posición central del mapa.
 % Elimine los símbolos de tanto por ciento para descomentar las siguientes instrucciones e incluir una imagen en su respuesta. La mejor ubicación de la imagen será determinada por el compilador de Latex. No tiene por qué situarse a continuación en el fichero en formato pdf resultante.
 %\begin{figure}
 %\centering
