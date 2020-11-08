@@ -1,11 +1,11 @@
 #!/bin/bash
 
-for (( i = 0; i < 1024; i++ ))
+for (( i = 2900; i < 4024; i++ ))
 do
 	./simulador -level $i -verbose
 	mv game.ppm $i.ppm
 	mv $i.ppm images_of_levels
-	convert images_of_levels/$i.ppm -scale 100x100 images_of_levels/$i.png
+	convert images_of_levels/$i.ppm -scale 500x500 images_of_levels/$i.png
 done
 
 cd images_of_levels
