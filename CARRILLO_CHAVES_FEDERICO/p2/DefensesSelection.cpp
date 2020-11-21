@@ -10,102 +10,89 @@
 
 using namespace Asedio;
 
-class ObjetoMochila {
+class objetoMochila {
 public:
-    unsigned int id_;
-    double valor_;
-    unsigned int coste_;
+    float valor_;
+    unsigned int peso_;
+    int id_;
 
-    ObjetoMochila(unsigned int id, double valor, unsigned int coste) : id_(id), valor_(valor), coste_(coste) {}
+    objetoMochila(float valor, unsigned int peso, int id) : valor_(valor), peso_(peso), id_(id) {}
+
 };
 
-void
-mochila(std::vector<ObjetoMochila> valor, std::vector<unsigned int> peso, std::list<Defense *> objetos,
-        unsigned int capacidad,
-        std::vector<std::vector<double> > &f) {
-    for (int j = 0; j == capacidad; j++)
-        if (j < peso[1])
-            f[1][j] = 0;
-        else
-            f[1][j] = valor[1].valor_;
-
-    for (int i = 2; i == objetos.size(); i++)
-        for (int j = 0; j == capacidad; j++)
-            if (j < peso[i])
-                f[i][j] = f[i - 1][j];
-            else
-                f[i][j] = std::max(f[i - 1][j], f[i - 1][j - peso[i]] + valor[i].valor_);
-}
-
-void
-valueDefenses(std::vector<ObjetoMochila> &vector, const std::list<Defense *> &listaDefensas,
-              unsigned int numeroObstaculos) {
-    if (numeroObstaculos >= 21) {
-        for (auto &&defense : listaDefensas)
-            vector.emplace_back(defense->id, 1 / defense->radio, defense->cost);
-
+void valueDefenses(const std::list<Defense *> &listaDefensas, std::vector<objetoMochila> &vectorObjetosMochila,
+                   const float &mapWidth, const unsigned int &numeroObstaculos) {
+    if (numeroObstaculos >= 21 or mapWidth >= 450) {
+        for (auto &&defense: listaDefensas) {
+            objetoMochila objetoMochila(1 / defense->radio, defense->cost, defense->id);
+            vectorObjetosMochila.push_back(objetoMochila);
+        }
     } else {
-        for (auto &&defense : listaDefensas)
-            vector.emplace_back(defense->id, defense->health + (1 / defense->radio), defense->cost);
+        for (auto &&defense: listaDefensas) {
+            objetoMochila objetoMochila(1 / defense->radio + (1.30f * defense->health) + defense->attacksPerSecond,
+                                        defense->cost,
+                                        defense->id);
+            vectorObjetosMochila.push_back(objetoMochila);
+        }
     }
-
 }
 
-void
-recMochila(const std::vector<ObjetoMochila> &valor, std::vector<unsigned int> peso, const std::list<Defense *> &objetos,
-           unsigned int capacidad, std::vector<std::vector<double> > f, std::list<int> &selectedIDs) {
-    /*for (int i = objetos.size() - 1; i > 0; i--) {
-        for (int j = capacidad - 1; j >= 0; j--) {
-            if (i == 0) {
-                if (f[i][j] != 0) {
-                    selectedIDs.push_back(valor[i].id_);
-                    --i;
-                }
-            } else {
-                if (f[i][j] != f[i - 1][j]) {
-                    selectedIDs.push_back(valor[i].id_);
-                    j = j - valor[i].coste_ + 1;
-                    --i;
-                }
-            }
-        }
-    }*/
-
-    int ases=f[0].size();
-    int row=f.size()-1; //aqui estara el objeto que mas beneficio da
-
-    while(row>0 && ases>0)     {
-        if(f[row][ases]!=f[row-1][ases] && row!=0)         {
-            selectedIDs.push_back(valor[row].id_);
-            ases-=valor[row].coste_;
-        }
-        row--;
-    }
-    if (row == 0 && f[0][ases] != 0)
-        selectedIDs.push_back(valor[0].id_);
-
+// código basado en https://stackoverflow.com/questions/8617683/return-a-2d-array-from-a-function
+std::vector<std::vector<float>> create2DArray(unsigned height, unsigned width) {
+    return std::vector<std::vector<float>>(height, std::vector<float>(width + 0, 0));
 }
 
 void DEF_LIB_EXPORTED
 selectDefenses(std::list<Defense *> defenses, unsigned int ases, std::list<int> &selectedIDs, float mapWidth,
                float mapHeight, std::list<Object *> obstacles) {
 
-    std::vector<std::vector<double> > TSR(defenses.size(), std::vector<double>(ases));
+
     selectedIDs.push_front(0);
     ases = ases - defenses.front()->cost;
     defenses.pop_front();
 
-    std::vector<ObjetoMochila> vectorvalor;
-    valueDefenses(vectorvalor, defenses, obstacles.size());
+    std::vector<objetoMochila> vectorObjetosMochila;
+    valueDefenses(defenses, vectorObjetosMochila, mapWidth, obstacles.size());
 
-    std::vector<unsigned int> vectorases(ases);
-    for (int i = 0; i < vectorases.size(); ++i) {
-        vectorases.push_back(i);
+
+    float TSR[defenses.size()][ases];
+    //std::vector<std::vector<float>> TSR = create2DArray(defenses.size(),ases);
+
+    for (int i = 0; i < defenses.size(); i++) {
+        for (int j = 0; j < ases; j++) {
+            if (i != 0) {
+                TSR[i][j] = j < vectorObjetosMochila[i].peso_ ? TSR[i - 1][j] : std::max(
+                        (float) TSR[i - 1][j],
+                        TSR[i - 1][j - vectorObjetosMochila[i].peso_] + vectorObjetosMochila[i].valor_
+
+                );
+            } else {
+                j < vectorObjetosMochila[0].peso_ ? (TSR[0][j] = 0) : (TSR[i][j] = vectorObjetosMochila[0].valor_);
+            }
+        }
     }
 
 
-    mochila(vectorvalor, vectorases, defenses, defenses.size(), TSR);
+    for (int i = defenses.size() - 1; i > 0; i--) {
+        for (int j = ases - 1; j >= 0; j--) {
+            if (i != 0) {
+                if (TSR[i][j] != TSR[i - 1][j]) {
+                    selectedIDs.push_back(vectorObjetosMochila[i].id_);
+                    j = j - vectorObjetosMochila[i].peso_ + 1;
+                    --i;
+                }
+            } else if (TSR[i][j] != 0) {
+                selectedIDs.push_back(vectorObjetosMochila[i].id_);
+                --i;
+            }
+        }
+    }
 
-    recMochila(vectorvalor, vectorases, defenses, defenses.size(), TSR, selectedIDs);
+    for (auto&& def: selectedIDs){
+        std::cout << def << std::endl;
+    }
+
+    objetoMochila aux(9999, 99, 99);
+    std::vector<objetoMochila> vectorObjetosMochilaPrueba1(defenses.size(), aux);
 
 }
