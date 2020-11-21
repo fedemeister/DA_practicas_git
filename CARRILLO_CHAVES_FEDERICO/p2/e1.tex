@@ -1,5 +1,9 @@
-La estrategia de selección de defensas que mejor se adapta a la estrategia por defecto es la siguiente:
+La estrategia de selección de defensas que en mi opinión mejor se adapta a la estrategia por defecto es la siguiente:
+$$f(mapWitdth, numObst, radio, health, aps)=\left\{ 
+  \begin{array}{lcr}
+    \frac{1}{radio} & si &numObst \geq 21 \vee mapWitdth \geq 450  \\ % caso 1
+    \frac{1}{radio} + 1.30 * health + aps & si&  numObst < 21 \wedge mapWitdth < 450 \\ % caso 2
+  \end{array}
+\right.$$
 
-$$ f(radio)=\frac{1}{radio} $$
-
-Con esta estrategia calificaremos mejor las defensas con menor radio y eso hará que protejan mejor a nuestra defensa principal.
+Con esta estrategia calificaremos mejor las defensas con menor radio y mayor salud. Eso hará que protejan mejor a nuestra defensa principal.
