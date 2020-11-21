@@ -1,15 +1,27 @@
 \begin{lstlisting}
-// sustituya este codigo por su respuesta
-void selectDefenses(...) {
+void valueDefenses(const std::list<Defense *> &listaDefensas, std::vector<objetoMochila> &vectorObjetosMochila, const float &mapWidth, const unsigned int &numeroObstaculos) {...}
+\end{lstlisting}
 
-    unsigned int cost = 0;
-    std::list<Defense*>::iterator it = defenses.begin();
-    while(it != defenses.end()) {
-        if(cost + (*it)->cost <= ases) {
-            selectedIDs.push_back((*it)->id);
-            cost += (*it)->cost;
+\begin{lstlisting}
+void selectDefenses(std::list<Defense *> defenses, unsigned int ases, std::list<int> &selectedIDs, float mapWidth, float mapHeight, std::list<Object *> obstacles) {
+[...]
+  std::vector<objetoMochila> vectorObjetosMochila;
+  valueDefenses(defenses, vectorObjetosMochila, mapWidth, obstacles.size());
+
+  float TSR[defenses.size()][ases];
+
+  for (int i = 0; i < defenses.size(); i++) {
+    for (int j = 0; j < ases; j++) {
+        if (i != 0) {
+            TSR[i][j] = j < vectorObjetosMochila[i].peso_ ? TSR[i - 1][j] : std::max(
+                (float) TSR[i - 1][j],
+                TSR[i - 1][j - vectorObjetosMochila[i].peso_] + vectorObjetosMochila[i].valor_
+                );
+            } else {
+                j < vectorObjetosMochila[0].peso_ ? (TSR[0][j] = 0) : (TSR[i][j] = vectorObjetosMochila[0].valor_);
+            }
         }
-        ++it;
     }
+[...]
 }
 \end{lstlisting}

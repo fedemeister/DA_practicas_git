@@ -1,15 +1,19 @@
 \begin{lstlisting}
-// sustituya este codigo por su respuesta
-void selectDefenses(...) {
-
-    unsigned int cost = 0;
-    std::list<Defense*>::iterator it = defenses.begin();
-    while(it != defenses.end()) {
-        if(cost + (*it)->cost <= ases) {
-            selectedIDs.push_back((*it)->id);
-            cost += (*it)->cost;
-        }
-        ++it;
+void selectDefenses(std::list<Defense *> defenses, unsigned int ases, std::list<int> &selectedIDs, float mapWidth, float mapHeight, std::list<Object *> obstacles) {
+[...]
+  for (int i = defenses.size() - 1; i > 0; i--) {
+    for (int j = ases - 1; j >= 0; j--) {
+      if (i != 0) {
+          if (TSR[i][j] != TSR[i - 1][j]) {
+              selectedIDs.push_back(vectorObjetosMochila[i].id_);
+              j = j - vectorObjetosMochila[i].peso_ + 1;
+              --i;
+          }
+      } else if (TSR[i][j] != 0) {
+          selectedIDs.push_back(vectorObjetosMochila[i].id_);
+          --i;
+      }
     }
+  }
 }
 \end{lstlisting}
