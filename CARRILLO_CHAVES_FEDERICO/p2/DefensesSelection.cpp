@@ -10,6 +10,12 @@
 
 using namespace Asedio;
 
+// código basado en https://stackoverflow.com/questions/8617683/return-a-2d-array-from-a-function
+std::vector<std::vector<float>> create2DArray(unsigned height, unsigned width) {
+    return std::vector<std::vector<float>>(height, std::vector<float>(width + 0, 0));
+}
+
+
 class objetoMochila {
 public:
     float valor_;
@@ -37,15 +43,9 @@ void valueDefenses(const std::list<Defense *> &listaDefensas, std::vector<objeto
     }
 }
 
-// código basado en https://stackoverflow.com/questions/8617683/return-a-2d-array-from-a-function
-std::vector<std::vector<float>> create2DArray(unsigned height, unsigned width) {
-    return std::vector<std::vector<float>>(height, std::vector<float>(width + 0, 0));
-}
-
 void DEF_LIB_EXPORTED
 selectDefenses(std::list<Defense *> defenses, unsigned int ases, std::list<int> &selectedIDs, float mapWidth,
                float mapHeight, std::list<Object *> obstacles) {
-
 
     selectedIDs.push_front(0);
     ases = ases - defenses.front()->cost;
@@ -88,11 +88,11 @@ selectDefenses(std::list<Defense *> defenses, unsigned int ases, std::list<int> 
         }
     }
 
-    for (auto&& def: selectedIDs){
-        std::cout << def << std::endl;
-    }
+    //for (auto&& def: selectedIDs){
+    //    std::cout << def << std::endl;
+    //}
 
-    objetoMochila aux(9999, 99, 99);
-    std::vector<objetoMochila> vectorObjetosMochilaPrueba1(defenses.size(), aux);
+    //objetoMochila aux(9999, 99, 99);
+    //std::vector<objetoMochila> vectorObjetosMochilaPrueba1(defenses.size(), aux);
 
 }
