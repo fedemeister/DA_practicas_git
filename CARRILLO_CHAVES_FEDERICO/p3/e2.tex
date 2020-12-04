@@ -1,1 +1,50 @@
-Escriba aquí su respuesta al ejercicio 2.
+Mi implementación del algoritmo de ordenación por fusión (decreciente) para objetos Celda es la siguiente:
+\begin{lstlisting}
+// Algoritmo basado en el pseudocodigo del libro "Introduction to Algorithms 3era edicion pagina 31"
+void merge(std::vector<Celda> &V, int p, int q, int r) {
+  int n1 = q - p + 1;
+  int n2 = r - q;
+  std::vector<Celda> L(n1), R(n2);
+  for (int i = 0; i < n1; ++i) {
+    L[i].valor_ = V[p + i].valor_;
+  }
+  for (int j = 0; j < n2; ++j) {
+    R[j].valor_ = V[q + j + 1].valor_;
+  }
+  int i = 0;
+  int j = 0;
+  int z = p;
+  while (i < n1 && j < n2) {
+    if (L[i].valor_ <= R[j].valor_) { // ahora ordena de forma decreciente.
+      V[z].valor_ = L[i].valor_;
+      i++;
+    } else {
+      V[z].valor_ = R[j].valor_;
+      j++;
+    }
+    z++;
+  }
+  while (i < n1) {
+    V[z].valor_ = L[i].valor_;
+    i++;
+    z++;
+   }
+   while (j < n2) {
+     V[z].valor_ = R[j].valor_;
+     j++;
+     z++;
+   }
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+// Algoritmo basado en el pseudocodigo del libro "Introduction to Algorithms 3era edicion pagina 31"
+void mergeSort(std::vector<Celda> &V, int p, int r) {
+  if (p < r) {
+    int q = (p + r) / 2;
+    mergeSort(V, p, q);
+    mergeSort(V, q + 1, r);
+    merge(V, p, q, r);
+  }
+}
+\end{lstlisting}
