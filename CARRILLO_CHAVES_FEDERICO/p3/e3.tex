@@ -1,1 +1,28 @@
-Escriba aquí su respuesta al ejercicio 3.
+Mi implementación del algoritmo de ordenación rápida (decreciente) para objectos Celda es la siguiente:
+\begin{lstlisting}
+// Algoritmo basado en el pseudocodigo del libro "Introduction to Algorithms 3era edicion pagina 171"
+int partition(std::vector<Celda> &V, int p, int r) {
+  int x = V[r].valor_;
+  int i = p - 1;
+  for (int j = p; j <= r - 1; ++j) {
+    if (V[j].valor_ >= x) { // ahora ordena de forma decreciente.
+      i = i + 1;
+      std::swap(V[i], V[j]);
+    }
+  }
+  std::swap(V[i + 1], V[r]);
+  return i + 1;
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+// Algoritmo basado en el pseudocodigo del libro "Introduction to Algorithms 3era edicion pagina 171"
+void quickSort(std::vector<Celda> &V, int p, int r) {
+  if (p < r) {
+    int q = partition(V, p, r);
+    quickSort(V, p, q - 1);
+    quickSort(V, q + 1, r);
+  }
+}
+    
+\end{lstlisting}
