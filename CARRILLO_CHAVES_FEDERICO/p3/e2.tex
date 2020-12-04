@@ -15,7 +15,7 @@ void merge(std::vector<Celda> &V, int p, int q, int r) {
   int j = 0;
   int z = p;
   while (i < n1 && j < n2) {
-    if (L[i].valor_ <= R[j].valor_) { // ahora ordena de forma decreciente.
+    if (L[i].valor_ >= R[j].valor_) { // ahora ordena de forma decreciente.
       V[z].valor_ = L[i].valor_;
       i++;
     } else {
