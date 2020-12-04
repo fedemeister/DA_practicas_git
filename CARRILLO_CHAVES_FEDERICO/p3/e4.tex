@@ -1,1 +1,37 @@
-Escriba aquí su respuesta al ejercicio 4.
+\begin{lstlisting}
+bool funcionComparacion(Celda const &celda1, Celda const &celda2) {
+  return celda1.valor_ > celda2.valor_;
+}
+
+\end{lstlisting}
+
+\begin{lstlisting}
+void pruebasCajaNegra() {
+  // Parametros que recibe celda es valor_ y Vector3_ respectivamente.
+  Celda c1(10, 0), c2(20, 0), c3(30, 0), c4(40, 0);
+  Celda c5(50, 0), c6(60, 0), c7(70, 0);
+  std::vector<Celda> v{c7, c6, c5, c4, c3, c2, c1};
+  std::vector<Celda> copia_de_v(v.size());
+  copia_de_v = v;
+  std::vector<Celda> aux_mergeSort(v.size());
+  std::vector<Celda> aux_quickSort(v.size());
+  unsigned int ok = 0;
+  unsigned int mal = 0;
+  do {
+    aux_mergeSort = v;
+    aux_quickSort = v;
+    mergeSort(aux_mergeSort, 0, v.size() - 1);
+    quickSort(aux_quickSort, 0, v.size() - 1);
+    int b = true;
+    for (int i = 0; i < v.size(); ++i) {
+      if (aux_mergeSort[i].valor_ != copia_de_v[i].valor_ || aux_quickSort[i].valor_ != copia_de_v[i].valor_)
+        b = false;
+    }
+    ++(b ? ok : mal);
+  } while (next_permutation(v.begin(), v.end(), funcionComparacion));
+  std::cout << "Permutaciones OK: " << ok << ", Permutaciones Error: " << mal << std::endl;
+}
+\end{lstlisting}
+\begin{quote}
+    Permutaciones OK: 5040, Permutaciones Error: 0    
+\end{quote}
