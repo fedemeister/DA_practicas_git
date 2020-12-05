@@ -1,1 +1,62 @@
-Escriba aquí su respuesta al ejercicio 2.
+\begin{lstlisting}
+    // Algoritmo basado en el pseudocodigo de las transparencias de teoria
+void DEF_LIB_EXPORTED
+calculatePath(AStarNode *originNode, AStarNode *targetNode, int cellsWidth, int cellsHeight, float mapWidth, float mapHeight, float **additionalCost, std::list<Vector3> &path) {    
+  float cellWidth = mapWidth / float(cellsWidth);
+  float cellHeight = mapHeight / float(cellsHeight);
+  std::vector<AStarNode *> opened;
+  std::vector<AStarNode *> closed;
+   
+  AStarNode *cur = originNode;
+  opened.push_back(cur);
+  std::make_heap(opened.begin(), opened.end());
+   
+  bool target = false;
+  while (!target && !opened.empty()) {
+    cur = opened.front();
+    std::pop_heap(opened.begin(), opened.end(), ComparaValor());
+    opened.pop_back();
+    closed.push_back(cur);
+    
+    if (cur == targetNode) {
+      target = true;
+      path.push_front(cur->position);
+    } else {
+      double d;
+      for (auto j = cur->adjacents.begin(); j != cur->adjacents.end(); ++j) {
+        if (closed.end() == std::find(closed.begin(), closed.end(), (*j))) {
+          if (!(opened.end() == std::find(opened.begin(), opened.end(), (*j)))) {
+            d = _distance(cur->position, (*j)->position);
+              if (cur->G + d < (*j)->G) {
+                (*j)->parent = cur;
+                (*j)->G = cur->G + float(d);
+                (*j)->F = (*j)->G + (*j)->H;
+              }
+           } else {
+            int pos_x = int((*j)->position.x / cellWidth);
+            int pos_y = int((*j)->position.y / cellHeight);
+            (*j)->parent = cur;
+            (*j)->G = cur->G +
+            _distance(cur->position, (*j)->position) + additionalCost[pos_x][pos_y];
+            (*j)->H = (float) dManhattan((*j)->position, targetNode->position);
+            (*j)->F = (*j)->G + (*j)->H;
+            opened.push_back(*j);
+            std::push_heap(opened.begin(), opened.end(), ComparaValor());
+          }
+        }
+      }
+      std::sort_heap(opened.begin(), opened.end(), ComparaValor());
+    }
+  }   
+  recupera(originNode, path, cur);
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+void recupera(const AStarNode *originNode, std::list<Vector3> &path, AStarNode *cur) {
+  while (cur->parent != originNode) {
+    cur = cur->parent;
+    path.push_front(cur->position);
+  }
+}
+\end{lstlisting}

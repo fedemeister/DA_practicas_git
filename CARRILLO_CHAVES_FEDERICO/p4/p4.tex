@@ -3,6 +3,25 @@
 \usepackage[left=2.00cm, right=2.00cm, top=2.00cm, bottom=2.00cm]{geometry}
 \usepackage[spanish,es-noshorthands]{babel}
 \usepackage[utf8]{inputenc} % para tildes y ñ
+\usepackage{graphicx} % para las figuras
+\usepackage{xcolor}
+\usepackage{listings} % para el código fuente en c++
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=single,
+  xleftmargin=\parindent,
+  language=C++,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{gray!40!gray},
+  identifierstyle=\color{black},
+  stringstyle=\color{orange},
+}
+\lstset{style=customc}
+
 
 %opening
 \title{Práctica 4. Exploración de grafos}

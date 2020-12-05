@@ -1,1 +1,13 @@
-Escriba aquí su respuesta al ejercicio 1.
+El algoritmo A* funciona de la siguiente manera:
+\begin{list}{-}{}
+    \item Como es el primer nodo, lo agregamos a la lista de nodos abiertos y trabajamos con él.
+    \item Buscamos los hasta 8 posibles nodos adyacentes a ese nodo. Si el nodo no es accesible se ignora.
+    \item Calculamos la F de los nodos adyacentes si no están en la lista de abiertos tomando como G la distancia euclídea al nodo origen y H la distancia de Manhattan al nodo destino.
+    \item Si hay un nodo adyacente que está en la lista de abiertos se mira si la nueva G es menor que la que ya tenía y si es así actualiza.
+    \item Se pasa el nodo actual a la lista de cerrados (también se puede hacer justo después de meterlo en la lista de abiertos).
+    \item Se saca el nodo con menor F calculada y volvemos a ejecutar todo el proceso hasta que el nodo actual sea el nodo objetivo.
+    \item Una vez que hemos llegado al nodo objetivo se llama a la función Recupera para ir saltando desde el nodo objetivo hasta su padre, luego hasta el padre de su padre y así sucesivamente hasta llegar al nodo origeen. Con eso iremos sacando cuál es el camino más óptimo para llegar hasta nuestro objetivo porque se ha actualizado en caso de que hayamos encontrado un F menor.
+\end{list}
+
+En este caso, la lista de adyacencia de un nodo viene ya como miembro de la calse AStarNode.
+Como el nodo con mejor F puede cambiar muchas veces, quizás no es conveniente ordenar un vector cada vez que tengamos un nuevo nodo con menor F sino que podemos ir agregando los nodos a nuestro montículo y tener siempre a mano el nodo con mejor F para procesarlo. El montículo empleado es de la STL.
