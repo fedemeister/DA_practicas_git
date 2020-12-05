@@ -17,12 +17,13 @@ void pruebasCajaNegra() {
   std::vector<Celda> aux_quickSort(v.size());
   unsigned int ok = 0;
   unsigned int mal = 0;
+  bool b;
   do {
     aux_mergeSort = v;
     aux_quickSort = v;
     mergeSort(aux_mergeSort, 0, v.size() - 1);
     quickSort(aux_quickSort, 0, v.size() - 1);
-    int b = true;
+    b = true;
     for (int i = 0; i < v.size(); ++i) {
       if (aux_mergeSort[i].valor_ != copia_de_v[i].valor_ || aux_quickSort[i].valor_ != copia_de_v[i].valor_)
         b = false;
